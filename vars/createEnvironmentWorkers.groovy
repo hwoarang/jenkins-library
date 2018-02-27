@@ -29,6 +29,9 @@ Environment call(Map parameters = [:]) {
         case 'openstack':
             echo "Secondary worker creation step unnecessary"
             return environment
+        case 'hyperv':
+            echo "Secondary worker creation step unnecessary"
+            return environment
         case 'bare-metal':
             // return a new, up-to-date environment object
             return createEnvironmentWorkersCaaspBareMetal()
