@@ -25,23 +25,23 @@ def call(Map parameters = [:]) {
 
             environment.minions.each { minion ->
                 def runTestInfraStep = {
-                    lock("testinfra-venv-setup") {
-                        sh("set -o pipefail; tox -e ${minion.role} --notest")
+                    try {
+                        timeout(30) {
+                            lock("testinfra-venv-setup") {
+                                sh("set -o pipefail; tox -e ${minion.role}-${minion.status} --notest")
+                            }
+
+                            sh("set -o pipefail; tox -e ${minion.role}-${minion.status} -- --hosts ${minion.fqdn} --junit-xml testinfra-${minion.role}-${minion.index}.xml -v | tee -a ${WORKSPACE}/logs/testinfra-${minion.role}-${minion.index}.log")
+                        }
+                    } finally {
+                        junit "testinfra-${minion.role}-${minion.index}.xml"
                     }
-
-                    sh("set -o pipefail; tox -e ${minion.role} -- --hosts ${minion.fqdn} --junit-xml testinfra-${minion.role}-${minion.index}.xml -v | tee -a ${WORKSPACE}/logs/testinfra-${minion.role}-${minion.index}.log")
                 }
 
-                parallelSteps.put("${minion.role}-${minion.index}", runTestInfraStep)
+                parallelSteps.put("${minion.role}-${minion.index}-${minion.status}", runTestInfraStep)
             }
 
-            try {
-                timeout(30) {
-                    parallel(parallelSteps)
-                }
-            } finally {
-                junit "testinfra-*.xml"
-            }
+            parallel(parallelSteps)
         }
     }
 }
