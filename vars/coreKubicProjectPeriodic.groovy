@@ -18,6 +18,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body = n
     boolean environmentDestroy = parameters.get('environmentDestroy', true)
     int masterCount = parameters.get('masterCount', 3)
     int workerCount = parameters.get('workerCount', 2)
+    boolean chooseCrio = parameters.get('chooseCrio', false)
 
     echo "Starting Kubic core project periodic"
 
@@ -33,6 +34,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body = n
                 gitCredentialsId: 'github-token',
                 masterCount: masterCount,
                 workerCount: workerCount,
+                chooseCrio: chooseCrio,
                 preBootstrapBody: preBootstrapBody) {
 
             // Run the Core Project Tests

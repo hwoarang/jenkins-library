@@ -16,6 +16,7 @@ import com.suse.kubic.Environment
 
 Environment call(Map parameters = [:]) {
     Environment environment = parameters.get('environment')
+    boolean chooseCrio = parameters.get('chooseCrio', false)
 
     // TODO: This and bootstrapEnvironment share 90% of the same code
 
@@ -28,7 +29,13 @@ Environment call(Map parameters = [:]) {
     timeout(90) {
         try {
             dir('automation/velum-bootstrap') {
-                sh(script: "./velum-interactions --configure --environment ${WORKSPACE}/environment.json")
+                if (chooseCrio) {
+                    echo "Choosing cri-o"
+                    sh(script: "./velum-interactions --configure --enable-tiller --environment ${WORKSPACE}/environment.json --choose-crio")
+                } else {
+                    echo "Choosing Docker"
+                    sh(script: "./velum-interactions --configure --enable-tiller --environment ${WORKSPACE}/environment.json")
+                }
             }
         } finally {
             dir('automation/velum-bootstrap') {
