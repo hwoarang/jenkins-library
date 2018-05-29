@@ -37,10 +37,6 @@ def call() {
         ),
     ]) {
         node(label) {
-            stage('Retrieve Code') {
-                checkout scm
-            }
-
             stage('GitHub Labels') {
                 // If this is a Pull Request build...
                 if (env.CHANGE_ID) {
