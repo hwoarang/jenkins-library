@@ -162,6 +162,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
                     }
                 } else {
                     echo "Skipping Destroy Environment as requested"
+                    offlineJenkinsSlave()
                 }
             }
 
