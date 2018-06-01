@@ -6,4 +6,6 @@ def libraryVersion = (pullNumber == null) ? targetBranch : "PR-$CHANGE_ID"
 
 library "kubic-jenkins-library@${libraryVersion}"
 
-coreKubicProjectHousekeeping()
+coreKubicProjectHousekeeping(
+    enableBugzillaReferenceCheck: false
+)
