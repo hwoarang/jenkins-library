@@ -42,7 +42,6 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
 
         // Basic prep steps
         stage('Preparation') {
-            cleanWs()
             sh(script: 'mkdir logs')
         }
 
@@ -152,6 +151,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
                     }
                 } else {
                     echo "Skipping Destroy Environment as requested"
+                    offlineJenkinsSlave()
                 }
             }
 
@@ -179,11 +179,15 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
 
             // Cleanup the node
             stage('Cleanup') {
-                try {
-                    cleanWs()
-                } catch (Exception exc) {
-                    // TODO: Figure out if we can mark this stage as failed, while allowing the remaining stages to proceed.
-                    echo "Failed to clean workspace"
+                if (environmentDestroy) {
+                    try {
+                        cleanWs()
+                    } catch (Exception exc) {
+                        // TODO: Figure out if we can mark this stage as failed, while allowing the remaining stages to proceed.
+                        echo "Failed to clean workspace"
+                    }
+                } else {
+                    echo "Skipping Cleanup as request was made to NOT destroy the environment"
                 }
             }
         }
