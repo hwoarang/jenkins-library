@@ -30,7 +30,7 @@ def call(Map parameters = [:]) {
         } else {
             echo "Marking build slave as online"
         }
-        
+
         computer.setTemporarilyOffline(offline, new OfflineCause.ByCLI(message))
     }
 }
