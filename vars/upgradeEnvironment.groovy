@@ -46,12 +46,17 @@ Environment call(Map parameters = [:]) {
                 dir('automation/velum-bootstrap') {
                     sh(script: "./velum-interactions --update-admin --environment ${WORKSPACE}/environment.json")
                     sh(script: "./velum-interactions --update-minions --environment ${WORKSPACE}/environment.json")
+                    sh(script: "./velum-interactions --download-kubeconfig --environment ${WORKSPACE}/environment.json")
+                    sh(script: "mv ${WORKSPACE}/kubeconfig ${WORKSPACE}/kubeconfig.old")
+                    sh(script: "cp kubeconfig ${WORKSPACE}/kubeconfig")
+                    sh(script: "diff -u ${WORKSPACE}/kubeconfig.old ${WORKSPACE}/kubeconfig || :")
                 }
             } finally {
                 dir('automation/velum-bootstrap') {
                     junit "velum-bootstrap.xml"
                     try {
                         archiveArtifacts(artifacts: "screenshots/**")
+                        archiveArtifacts(artifacts: "kubeconfig")
                     } catch (Exception exc) {
                         echo "Failed to Archive Artifacts"
                     }
