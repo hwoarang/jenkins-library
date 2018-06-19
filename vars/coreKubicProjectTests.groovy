@@ -26,6 +26,9 @@ def call(Map parameters = [:]) {
     }
 
     stage('Cluster Tests') {
+        sh(script: "kubectl --version")
+        sh(script: "set -o pipefail; kubectl get nodes --kubeconfig=${WORKSPACE}/kubeconfig -o jsonpath='{.items[*].status.nodeInfo.containerRuntimeVersion}'|tr ' ' '\n'|sort|uniq -c ")
+
         parallel 'K8S Pod Tests': {
             runK8SPodTests(
                 podName: podName,
@@ -38,7 +41,7 @@ def call(Map parameters = [:]) {
             helmInstallClient()
 
             String releaseName = "helm-" + UUID.randomUUID()
-            
+
             helmInstallChart(
                 environment: environment,
                 releaseName: releaseName,

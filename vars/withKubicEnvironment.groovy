@@ -24,6 +24,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
     boolean gitIgnorePullRequest = parameters.get('gitIgnorePullRequest', false)
     int masterCount = parameters.get('masterCount', 3)
     int workerCount = parameters.get('workerCount', 2)
+    boolean chooseCrio = parameters.get('chooseCrio', false)
 
     echo "Creating Kubic Environment"
 
@@ -95,7 +96,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
 
             // Configure the Kubic environment
             stage('Configure Environment') {
-                configureEnvironment(environment: environment)
+                configureEnvironment(environment: environment, chooseCrio: chooseCrio)
             }
 
             // Create Workers
