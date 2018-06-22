@@ -14,37 +14,17 @@
 import com.suse.kubic.Environment
 import com.suse.kubic.Minion
 
+// Upgrade Stage 2 - Performs remaining upgrade steps using the "new"
+// version of the automation tools.
 
 Environment call(Map parameters = [:]) {
     Environment environment = parameters.get('environment')
-    boolean fakeUpdatesAvailable = parameters.get('fakeUpdatesAvailable', false)
-
-    // Find the admin minion
-    Minion adminMinion = null
-
-    environment.minions.each { minion ->
-        if (minion.role == "admin") {
-            adminMinion = minion
-        }
-    }
-
-    stage('Upgrade Environment') {
-        if (fakeUpdatesAvailable) {
-            // Fake the need for updates
-            shOnMinion(
-                minion: adminMinion,
-                script: "docker exec -i \\\$(docker ps | grep salt-master | awk '{print \\\$1}') salt '*' grains.setval tx_update_reboot_needed true"
-            )
-        }
-
-        // Refresh Salt Grains (we could wait 10 mins, but that's 10 minutes wasted in CI)
-        shOnMinion(minion: adminMinion, script: "docker exec -i \\\$(docker ps | grep salt-master | awk '{print \\\$1}') salt '*' saltutil.refresh_grains")
-
+    
+    stage('Upgrade Environment 2') {
         // Perform the upgrade
-        timeout(125) {
+        timeout(185) {
             try {
                 dir('automation/velum-bootstrap') {
-                    sh(script: "./velum-interactions --update-admin --environment ${WORKSPACE}/environment.json")
                     sh(script: "./velum-interactions --update-minions --environment ${WORKSPACE}/environment.json")
                     sh(script: "./velum-interactions --download-kubeconfig --environment ${WORKSPACE}/environment.json")
                     sh(script: "mv ${WORKSPACE}/kubeconfig ${WORKSPACE}/kubeconfig.old")
