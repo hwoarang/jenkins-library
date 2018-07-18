@@ -8,7 +8,7 @@ class CaaspKvmTypeOptions implements Serializable {
 	String extraRepo = null;
 	boolean disableMeltdownSpectreFixes = true;
 
-	int adminRam = 4096;
+	int adminRam = 8192;
 	int adminCpu = 4;
 	int masterRam = 4096;
 	int masterCpu = 4;
