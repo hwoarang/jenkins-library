@@ -64,20 +64,17 @@ Environment call(Map parameters = [:]) {
             } finally {
                 archiveArtifacts(artifacts: "cluster.tf", fingerprint: true)
                 archiveArtifacts(artifacts: "terraform.tfstate", fingerprint: true)
-
                 String timestamp = new Date().format('yMd-hms')
                 sh(script: "cp cluster.tf $WORKSPACE/logs/cluster.tf-after_create_deployment-${timestamp}")
                 sh(script: "cp terraform.tfstate $WORKSPACE/logs/terraform.tfstate-after_create_deployment-${timestamp}")
+
+                // Save in a well-known location and read the generated environment file
+                sh(script: "cp environment.json ${WORKSPACE}/environment.json")
+                sh(script: "cat ${WORKSPACE}/environment.json")
+                environment = new Environment(readJSON(file: 'environment.json'))
+                archiveArtifacts(artifacts: 'environment.json', fingerprint: true)
             }
-
-            // Read the generated environment file
-            environment = new Environment(readJSON(file: 'environment.json'))
-
-            sh(script: "cp environment.json ${WORKSPACE}/environment.json")
-            sh(script: "cat ${WORKSPACE}/environment.json")
         }
-
-        archiveArtifacts(artifacts: 'environment.json', fingerprint: true)
     }
 
     return environment
