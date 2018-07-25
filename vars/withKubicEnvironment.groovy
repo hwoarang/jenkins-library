@@ -148,6 +148,18 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
 
             // Destroy the Kubic Environment
             stage('Destroy Environment') {
+                if (environmentDestroy && currentBuild.resultIsWorseOrEqualTo('UNSTABLE')) {
+                    // If a run fails allow skipping cleanup
+                    try {
+                        timeout(time: 15, unit: 'MINUTES') {
+                            environmentDestroy = input(id: 'Destroy1', message: "Destroy environment now?", parameters: [
+                                booleanParam(name: 'environmentDestroy', defaultValue: true, description: '')
+                            ])
+                        }
+                    } catch(err) {
+                      // timeout reached: cleanup environment now
+                    }
+                }
                 if (environmentDestroy) {
                     try {
                         cleanupEnvironment(
@@ -158,11 +170,12 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
                         )
                     } catch (Exception exc) {
                         // TODO: Figure out if we can mark this stage as failed, while allowing the remaining stages to proceed.
-                        echo "Failed to Destroy Environment"
+                        echo "Failed to Destroy Environment. Recycling worker."
+                        offlineJenkinsSlave(message: "Marked offline by ${env.BUILD_URL} due to failed cleanup")
                     }
                 } else {
                     echo "Skipping Destroy Environment as requested"
-                    offlineJenkinsSlave(message: "Marked offline by ${env.BUILD_URL}")
+                    offlineJenkinsSlave(message: "Marked offline by ${env.BUILD_URL} due to user request")
                 }
             }
 
