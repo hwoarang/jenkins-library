@@ -62,6 +62,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
 
         Environment environment;
 
+        boolean buildFailure = false
         try {
             // Create the Kubic environment
             stage('Create Environment') {
@@ -72,6 +73,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
                     workerCount: workerCount
                 )
             }
+
             stage('Deploy CI Tools') {
                 // Install Netdata on admin host
                 sh(script: "set -o pipefail; ${WORKSPACE}/automation/misc-tools/netdata/install admin | tee ${WORKSPACE}/logs/netdata-install-admin.log")
@@ -130,6 +132,9 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
                 // handle cases where the closure modify the environment.
                 environment = bodyResult
             }
+        } catch (Exception exc) {
+            buildFailure = true
+            throw exc
         } finally {
             // Gather Netdata metrics and generate charts
             stage('Gather Netdata metrics') {
@@ -148,8 +153,9 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
 
             // Destroy the Kubic Environment
             stage('Destroy Environment') {
-                if (environmentDestroy && currentBuild.resultIsWorseOrEqualTo('UNSTABLE')) {
+                if (environmentDestroy && buildFailure) {
                     // If a run fails allow skipping cleanup
+                    echo "Requesting user input before destroying the environment"
                     try {
                         timeout(time: 15, unit: 'MINUTES') {
                             environmentDestroy = input(id: 'Destroy1', message: "Destroy environment now?", parameters: [
@@ -157,9 +163,10 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
                             ])
                         }
                     } catch(err) {
-                      // timeout reached: cleanup environment now
+                      echo "Input timeout reached: destroying environment now"
                     }
                 }
+
                 if (environmentDestroy) {
                     try {
                         cleanupEnvironment(
@@ -188,6 +195,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
                     // TODO: Figure out if we can mark this stage as failed, while allowing the remaining stages to proceed.
                     echo "Failed to Archive Logs"
                 }
+
                 echo "Writing logs to database"
                 try {
                   withCredentials([string(credentialsId: 'database-host', variable: 'DBHOST')]) {
