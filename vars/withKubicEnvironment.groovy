@@ -44,7 +44,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
 
         // Basic prep steps
         stage('Preparation') {
-            sh(script: 'mkdir logs')
+            sh(script: 'mkdir -p logs')
         }
 
         // Fetch the necessary code
