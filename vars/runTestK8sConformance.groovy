@@ -15,7 +15,7 @@
 def call(Map parameters = [:]) {
     dir("${WORKSPACE}/automation/k8s-e2e-tests") {
         try {
-            timeout(2 * 60 * 60) {
+            timeout(180) {
                 ansiColor {
                     sh(script: "./e2e-tests --kubeconfig ${WORKSPACE}/kubeconfig")
                 }
