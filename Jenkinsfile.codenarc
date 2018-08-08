@@ -41,7 +41,7 @@ podTemplate(label: label, containers: [
                 } finally {
                     archiveArtifacts(artifacts: "CodeNarcReport.html", fingerprint: true)
                     archiveArtifacts(artifacts: "CodeNarcXmlReport.xml", fingerprint: true)
-                    junit "CodeNarcXmlReport.xml"
+                    warningsCodeNarc(filename: 'CodeNarcXmlReport.xml')
                 }
             }
         }
