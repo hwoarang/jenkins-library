@@ -40,6 +40,7 @@ podTemplate(label: label, containers: [
                     sh 'java -classpath /groovy-all-2.4.6.jar:/CodeNarc-1.1.jar:/slf4j-api-1.7.25.jar:/slf4j-simple-1.7.25.jar org.codenarc.CodeNarc -report=html -report=xml'
                 } finally {
                     archiveArtifacts(artifacts: "CodeNarcReport.html", fingerprint: true)
+                    archiveArtifacts(artifacts: "CodeNarcXmlReport.xml", fingerprint: true)
                     junit "CodeNarcXmlReport.xml"
                 }
             }
