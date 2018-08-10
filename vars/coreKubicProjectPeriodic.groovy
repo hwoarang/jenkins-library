@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body = null) {
-    String nodeLabel = parameters.get('nodeLabel', 'leap42.3&&jenkins.dedicated')
+    String nodeLabel = parameters.get('nodeLabel', 'leap42.3&&caasp-nightly-worker')
     String environmentType = parameters.get('environmentType', 'caasp-kvm')
     def environmentTypeOptions = parameters.get('environmentTypeOptions', null)
     boolean environmentDestroy = parameters.get('environmentDestroy', true)

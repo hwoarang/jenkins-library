@@ -29,7 +29,7 @@ def call() {
     ])
 
     withKubicEnvironment(
-            nodeLabel: 'leap42.3&&32GB',
+            nodeLabel: 'leap42.3&&caasp-pr-worker',
             environmentType: 'caasp-kvm',
             gitBase: 'https://github.com/kubic-project',
             gitBranch: env.getEnvironment().get('CHANGE_TARGET', env.BRANCH_NAME),
