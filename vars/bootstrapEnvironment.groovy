@@ -27,9 +27,15 @@ Environment call(Map parameters = [:]) {
 
     timeout(125) {
         try {
-            dir('automation/velum-bootstrap') {
-                sh(script: "./velum-interactions --bootstrap --download-kubeconfig --environment ${WORKSPACE}/environment.json")
-                sh(script: "cp kubeconfig ${WORKSPACE}/kubeconfig")
+            parallel 'monitor-logs': {
+                sh(script: "${WORKSPACE}/automation/misc-tools/parallel-ssh -e ${WORKSPACE}/environment.json -i ${WORKSPACE}/automation/misc-files/id_shared all -- journalctl -f")
+            },
+            'bootstrap': {
+                dir('automation/velum-bootstrap') {
+                    sh(script: "./velum-interactions --bootstrap --download-kubeconfig --environment ${WORKSPACE}/environment.json")
+                    sh(script: "cp kubeconfig ${WORKSPACE}/kubeconfig")
+                    sh(script: "${WORKSPACE}/automation/misc-tools/parallel-ssh --stop -e ${WORKSPACE}/environment.json -i ${WORKSPACE}/automation/misc-files/id_shared all -- journalctl -f")
+                }
             }
 
             // Read the updated environment file
