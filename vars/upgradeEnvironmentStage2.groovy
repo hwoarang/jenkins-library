@@ -25,7 +25,13 @@ Environment call(Map parameters = [:]) {
         timeout(185) {
             try {
                 dir('automation/velum-bootstrap') {
-                    sh(script: "./velum-interactions --update-minions --environment ${WORKSPACE}/environment.json")
+                    parallel 'monitor-logs-update-minions': {
+                        sh(script: "${WORKSPACE}/automation/misc-tools/parallel-ssh -e ${WORKSPACE}/environment.json -i ${WORKSPACE}/automation/misc-files/id_shared all -- journalctl -f")
+                    },
+                    'update-minions': {
+                        sh(script: "./velum-interactions --update-minions --environment ${WORKSPACE}/environment.json")
+                        sh(script: "${WORKSPACE}/automation/misc-tools/parallel-ssh --stop -e ${WORKSPACE}/environment.json -i ${WORKSPACE}/automation/misc-files/id_shared all -- journalctl -f")
+                    }
                     sh(script: "./velum-interactions --download-kubeconfig --environment ${WORKSPACE}/environment.json")
                     sh(script: "mv ${WORKSPACE}/kubeconfig ${WORKSPACE}/kubeconfig.old")
                     sh(script: "cp kubeconfig ${WORKSPACE}/kubeconfig")
