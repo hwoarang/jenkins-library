@@ -45,8 +45,14 @@ Environment call(Map parameters = [:]) {
         // Perform the upgrade
         timeout(185) {
             try {
-                dir('automation/velum-bootstrap') {
-                    sh(script: "./velum-interactions --update-admin --environment ${WORKSPACE}/environment.json")
+                parallel 'monitor-logs-update-admin': {
+                    sh(script: "${WORKSPACE}/automation/misc-tools/parallel-ssh -e ${WORKSPACE}/environment.json -i ${WORKSPACE}/automation/misc-files/id_shared all -- journalctl -f")
+                },
+                'update-admin': {
+                    dir('automation/velum-bootstrap') {
+                        sh(script: "./velum-interactions --update-admin --environment ${WORKSPACE}/environment.json")
+                    }
+                    sh(script: "${WORKSPACE}/automation/misc-tools/parallel-ssh --stop -e ${WORKSPACE}/environment.json -i ${WORKSPACE}/automation/misc-files/id_shared all -- journalctl -f")
                 }
             } finally {
                 dir('automation/velum-bootstrap') {
