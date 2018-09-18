@@ -19,7 +19,7 @@ import com.suse.kubic.Minion
 
 Environment call(Map parameters = [:]) {
     Environment environment = parameters.get('environment')
-    
+
     stage('Upgrade Environment 2') {
         // Perform the upgrade
         timeout(185) {
@@ -29,8 +29,11 @@ Environment call(Map parameters = [:]) {
                         sh(script: "${WORKSPACE}/automation/misc-tools/parallel-ssh -e ${WORKSPACE}/environment.json -i ${WORKSPACE}/automation/misc-files/id_shared all -- journalctl -f")
                     },
                     'update-minions': {
-                        sh(script: "./velum-interactions --update-minions --environment ${WORKSPACE}/environment.json")
-                        sh(script: "${WORKSPACE}/automation/misc-tools/parallel-ssh --stop -e ${WORKSPACE}/environment.json -i ${WORKSPACE}/automation/misc-files/id_shared all -- journalctl -f")
+                        try {
+                            sh(script: "./velum-interactions --update-minions --environment ${WORKSPACE}/environment.json")
+                        } finally {
+                            sh(script: "${WORKSPACE}/automation/misc-tools/parallel-ssh --stop -e ${WORKSPACE}/environment.json -i ${WORKSPACE}/automation/misc-files/id_shared all -- journalctl -f")
+                        }
                     }
                     sh(script: "./velum-interactions --download-kubeconfig --environment ${WORKSPACE}/environment.json")
                     sh(script: "mv ${WORKSPACE}/kubeconfig ${WORKSPACE}/kubeconfig.old")

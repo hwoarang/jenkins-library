@@ -31,9 +31,12 @@ Environment call(Map parameters = [:]) {
                 sh(script: "${WORKSPACE}/automation/misc-tools/parallel-ssh -e ${WORKSPACE}/environment.json -i ${WORKSPACE}/automation/misc-files/id_shared all -- journalctl -f")
             },
             'bootstrap': {
-                dir('automation/velum-bootstrap') {
-                    sh(script: "./velum-interactions --bootstrap --download-kubeconfig --environment ${WORKSPACE}/environment.json")
-                    sh(script: "cp kubeconfig ${WORKSPACE}/kubeconfig")
+                try {
+                    dir('automation/velum-bootstrap') {
+                        sh(script: "./velum-interactions --bootstrap --download-kubeconfig --environment ${WORKSPACE}/environment.json")
+                        sh(script: "cp kubeconfig ${WORKSPACE}/kubeconfig")
+                    }
+                } finally {
                     sh(script: "${WORKSPACE}/automation/misc-tools/parallel-ssh --stop -e ${WORKSPACE}/environment.json -i ${WORKSPACE}/automation/misc-files/id_shared all -- journalctl -f")
                 }
             }
