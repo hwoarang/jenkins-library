@@ -49,10 +49,13 @@ Environment call(Map parameters = [:]) {
                     sh(script: "${WORKSPACE}/automation/misc-tools/parallel-ssh -e ${WORKSPACE}/environment.json -i ${WORKSPACE}/automation/misc-files/id_shared all -- journalctl -f")
                 },
                 'update-admin': {
-                    dir('automation/velum-bootstrap') {
-                        sh(script: "./velum-interactions --update-admin --environment ${WORKSPACE}/environment.json")
+                    try {
+                        dir('automation/velum-bootstrap') {
+                            sh(script: "./velum-interactions --update-admin --environment ${WORKSPACE}/environment.json")
+                        }
+                    } finally {
+                        sh(script: "${WORKSPACE}/automation/misc-tools/parallel-ssh --stop -e ${WORKSPACE}/environment.json -i ${WORKSPACE}/automation/misc-files/id_shared all -- journalctl -f")
                     }
-                    sh(script: "${WORKSPACE}/automation/misc-tools/parallel-ssh --stop -e ${WORKSPACE}/environment.json -i ${WORKSPACE}/automation/misc-files/id_shared all -- journalctl -f")
                 }
             } finally {
                 dir('automation/velum-bootstrap') {
