@@ -44,7 +44,12 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
 
         // Basic prep steps
         stage('Preparation') {
-            sh(script: 'mkdir -p logs')
+            def tainted = fileExists("logs")
+            if (tainted) {
+                deleteJenkinsSlave()
+                error("The worker ${env.NODE_NAME} was tainted and has been deleted.")
+            }
+            sh(script: 'mkdir ${WORKSPACE}/logs')
         }
 
         // Fetch the necessary code
