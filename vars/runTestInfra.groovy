@@ -17,6 +17,15 @@ def call(Map parameters = [:]) {
     Environment environment = parameters.get('environment')
 
     dir("automation/testinfra") {
+        echo "Tox version"
+        sh("tox --version")
+        echo "setting up the Tox test envs"
+        timeout(10) {
+            environment.minions.each { minion ->
+                sh("tox -e ${minion.role}-${minion.status} --notest")
+            }
+        }
+        echo "running Tox remotely against all minions"
         withEnv([
             "SSH_CONFIG=${WORKSPACE}/automation/misc-tools/environment.ssh_config",
             "ENVIRONMENT_JSON=${WORKSPACE}/environment.json"
@@ -27,10 +36,6 @@ def call(Map parameters = [:]) {
                 def runTestInfraStep = {
                     try {
                         timeout(30) {
-                            lock("testinfra-venv-setup") {
-                                sh("set -o pipefail; tox -e ${minion.role}-${minion.status} --notest")
-                            }
-
                             sh("set -o pipefail; tox -e ${minion.role}-${minion.status} -- --hosts ${minion.fqdn} --junit-xml testinfra-${minion.role}-${minion.index}.xml -v | tee -a ${WORKSPACE}/logs/testinfra-${minion.role}-${minion.index}.log")
                         }
                     } finally {
