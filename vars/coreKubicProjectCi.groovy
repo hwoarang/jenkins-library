@@ -26,11 +26,15 @@ def call() {
     properties([
         buildDiscarder(logRotator(numToKeepStr: '15')),
         disableConcurrentBuilds(),
+        parameters([
+            booleanParam(name: 'ENVIRONMENT_DESTROY', defaultValue: true, description: 'Destroy env once done?')
+        ]),
     ])
 
     withKubicEnvironment(
             nodeLabel: 'leap15.0&&caasp-pr-worker',
             environmentType: 'caasp-kvm',
+            environmentDestroy: env.getEnvironment().get('ENVIRONMENT_DESTROY', 'true').toBoolean(),
             gitBase: 'https://github.com/kubic-project',
             gitBranch: env.getEnvironment().get('CHANGE_TARGET', env.BRANCH_NAME),
             gitCredentialsId: 'github-token',
