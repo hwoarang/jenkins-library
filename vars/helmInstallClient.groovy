@@ -14,13 +14,20 @@
 import com.suse.kubic.Environment
 
 def call() {
-    lock("helm-install-client") {
-        // This whole thing is a hack, we should be using our builds of the
-        // helm client.
-        sh(script: "wget -O /tmp/helm.tar.gz https://kubernetes-helm.storage.googleapis.com/helm-v2.8.2-linux-amd64.tar.gz")
-        sh(script: "tar --directory /tmp -xzvf /tmp/helm.tar.gz")
-        sh(script: "mv /tmp/linux-amd64/helm ${WORKSPACE}/helm")
-        sh(script: "${WORKSPACE}/helm --home ${WORKSPACE}/.helm init --client-only")
-        sh(script: "${WORKSPACE}/helm --home ${WORKSPACE}/.helm repo update")
+    String namespace = 'kube-system'
+    withEnv(["KUBECONFIG=${WORKSPACE}/kubeconfig"]) {
+        sh(script: "set -o pipefail; kubectl get namespaces | grep ${namespace}")
+        sh(script: "set -o pipefail; kubectl get serviceaccounts --namespace ${namespace} |grep tiller")
+        sh(script: "set -o pipefail; kubectl get pods --namespace ${namespace} --kubeconfig=${WORKSPACE}/kubeconfig  | grep tiller-deploy ")
+
+        lock("helm-install-client") {
+            // This whole thing is a hack, we should be using our builds of the
+            // helm client.
+            sh(script: "wget -O /tmp/helm.tar.gz https://kubernetes-helm.storage.googleapis.com/helm-v2.8.2-linux-amd64.tar.gz")
+            sh(script: "tar --directory /tmp -xzvf /tmp/helm.tar.gz")
+            sh(script: "mv /tmp/linux-amd64/helm ${WORKSPACE}/helm")
+            sh(script: "${WORKSPACE}/helm --home ${WORKSPACE}/.helm init --client-only")
+            sh(script: "${WORKSPACE}/helm --home ${WORKSPACE}/.helm repo update")
+        }
     }
 }

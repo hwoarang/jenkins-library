@@ -37,7 +37,9 @@ def call(Map parameters = [:]) {
 
     writeYaml(file: "helm-values-${safeChartName}-${releaseName}.yaml", data: values)
     archiveArtifacts(artifacts: "helm-values-${safeChartName}-${releaseName}.yaml", fingerprint: true)
-
+    sh(script: "${WORKSPACE}/helm --home ${WORKSPACE}/.helm repo list")
+    sh(script: "${WORKSPACE}/helm --home ${WORKSPACE}/.helm search ${chartName}")
+    sh(script: "${WORKSPACE}/helm --home ${WORKSPACE}/.helm inspect ${chartName}")
     withEnv(["KUBECONFIG=${WORKSPACE}/kubeconfig"]) {
         sh(script: "set -o pipefail; ${WORKSPACE}/helm --home ${WORKSPACE}/.helm install ${chartName} ${waitFlag} ${versionFlag} --namespace ${releaseName} --name ${releaseName} --values helm-values-${safeChartName}-${releaseName}.yaml 2>&1 | tee ${WORKSPACE}/logs/helm-install-${releaseName}-${safeChartName}.log")
     }
