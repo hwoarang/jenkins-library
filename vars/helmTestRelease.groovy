@@ -27,6 +27,10 @@ def call(Map parameters = [:]) {
     }
 
     withEnv(["KUBECONFIG=${WORKSPACE}/kubeconfig"]) {
+        sh(script: "${WORKSPACE}/helm --home ${WORKSPACE}/.helm version")
+        sh(script: "${WORKSPACE}/helm --home ${WORKSPACE}/.helm status ${releaseName}")
+        sh(script: "${WORKSPACE}/helm --home ${WORKSPACE}/.helm get ${releaseName}")
+        sh(script: "set -o pipefail; ${WORKSPACE}/helm --home ${WORKSPACE}/.helm ls | grep ${releaseName} | grep DEPLOYED")
         sh(script: "set -o pipefail; ${WORKSPACE}/helm --home ${WORKSPACE}/.helm test ${cleanupFlag} --timeout ${timeout} ${releaseName} 2>&1 | tee ${WORKSPACE}/logs/helm-test-${releaseName}.log")
     }
 }
