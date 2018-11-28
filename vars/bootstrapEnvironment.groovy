@@ -19,6 +19,12 @@ Environment call(Map parameters = [:]) {
 
     // TODO: This and configureEnvironment share 90% of the same code
 
+    timeout(125) {
+        dir('automation/misc-tools') {
+            sh(script: "python3 ./wait-for-velum https://\$(jq '.minions[0].addresses.publicIpv4' -r ${WORKSPACE}/environment.json) --timeout 2")
+        }
+    }
+
     timeout(90) {
         dir('automation/velum-bootstrap') {
             sh(script: './velum-interactions --setup')
