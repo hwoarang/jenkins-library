@@ -23,6 +23,8 @@ def call(Map parameters = [:]) {
             return prepareImageOpenStack(typeOptions: typeOptions)
         case 'bare-metal':
             return prepareImageCaaspBareMetal(typeOptions: typeOptions)
+        case 'hyperv':
+            return prepareImageCaaspHyperv(typeOptions: typeOptions)
         default:
             error("Unknown environment type: ${type}")
     }
