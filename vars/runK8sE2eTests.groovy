@@ -26,7 +26,7 @@ def call(Map parameters = [:]) {
 
     dir("${WORKSPACE}/automation/k8s-e2e-tests") {
         try {
-            timeout(180) {
+            timeout(env.getEnvironment().get('E2E_WAIT_TIME', '180').toInteger()) {
                 ansiColor {
                     sh(script: e2eCmd)
                 }
