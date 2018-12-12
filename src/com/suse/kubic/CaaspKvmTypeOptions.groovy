@@ -6,7 +6,7 @@ class CaaspKvmTypeOptions implements Serializable {
 	String channel = 'devel';
 	boolean vanilla = false;
 	String extraRepo = null;
-	boolean disableMeltdownSpectreFixes = true;
+	boolean disableMeltdownSpectreFixes = false;
 	int timeout = 45;
 
 	int adminRam = 8192;
