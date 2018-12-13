@@ -188,9 +188,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
                             workerCount: workerCount
                         )
                     } catch (Exception exc) {
-                        // TODO: Figure out if we can mark this stage as failed, while allowing the remaining stages to proceed.
-                        echo "Failed to Destroy Environment. Recycling worker."
-                        offlineJenkinsSlave(message: "Marked offline by ${env.BUILD_URL} due to failed cleanup")
+                        echo "Failed to Destroy Environment."
                     }
                 } else {
                     echo "Skipping Destroy Environment as requested"
