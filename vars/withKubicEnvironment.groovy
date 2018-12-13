@@ -43,11 +43,6 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
             echo "Public IPv4: ${response.content}"
         }
 
-        // Fetch the necessary code
-        stage('Retrieve Code') {
-            cloneAllKubicRepos(gitBase: gitBase, branch: gitBranch, credentialsId: gitCredentialsId, ignorePullRequest: gitIgnorePullRequest)
-        }
-
         // Cleanup host before run
         stage('Cleanup') {
             // Delete any leftover workspace and create a new one
@@ -62,6 +57,11 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
             sh(script: 'virsh list --all ; virsh net-list --all ; virsh pool-list --all; virsh vol-list default')
             sh(script: 'docker rm -f $(docker ps -a -q) || :')
             sh(script: 'docker system prune --all --force --volumes || :')
+        }
+
+        // Fetch the necessary code
+        stage('Retrieve Code') {
+            cloneAllKubicRepos(gitBase: gitBase, branch: gitBranch, credentialsId: gitCredentialsId, ignorePullRequest: gitIgnorePullRequest)
         }
 
         // Fetch the necessary images
