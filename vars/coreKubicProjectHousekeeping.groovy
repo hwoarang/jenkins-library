@@ -28,12 +28,12 @@ def call(Map parameters = [:]) {
 
     String changeTarget = env.getEnvironment().get('CHANGE_TARGET', env.BRANCH_NAME)
     boolean isBackport = changeTarget.matches(/release-\d\.\d/)
-    boolean hasBackportLabel = pullRequest.labels.contains("${changeTarget}-backport")
 
     stage('GitHub Labels') {
         // If this is a Pull Request build...
         if (env.CHANGE_ID) {
             echo "Add a backport label if needed"
+            boolean hasBackportLabel = pullRequest.labels.contains("${changeTarget}-backport")
             if (isBackport && !hasBackportLabel) {
                 echo "Adding backport label: ${changeTarget}-backport"
                 pullRequest.addLabels(["${changeTarget}-backport".toString()])
