@@ -43,19 +43,25 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
             echo "Public IPv4: ${response.content}"
         }
 
-        // Basic prep steps
-        stage('Preparation') {
-            def tainted = fileExists("logs")
-            if (tainted) {
-                deleteJenkinsSlave()
-                error("The worker ${env.NODE_NAME} was tainted and has been deleted.")
-            }
-            sh(script: 'mkdir ${WORKSPACE}/logs')
-        }
-
         // Fetch the necessary code
         stage('Retrieve Code') {
             cloneAllKubicRepos(gitBase: gitBase, branch: gitBranch, credentialsId: gitCredentialsId, ignorePullRequest: gitIgnorePullRequest)
+        }
+
+        // Cleanup host before run
+        stage('Cleanup') {
+            // Delete any leftover workspace and create a new one
+            sh(script: 'rm -rf ${WORKSPACE} || : ')
+            sh(script: 'mkdir -p ${WORKSPACE}/logs || : ')
+            sh(script: 'chmod a+x ${WORKSPACE} || : ')
+            sh(script: 'virsh net-undefine caasp-dev-net || : ')
+            sh(script: 'virsh net-destroy caasp-dev-net || : ')
+            sh(script: 'for i in $(virsh list --all|awk \'/running/ {print $2}\');do echo $i;virsh destroy $i;done')
+            sh(script: 'for i in $(virsh list --all|awk \'/shut off/ {print $2}\');do echo $i;virsh undefine $i;done')
+            sh(script: 'for fn in $(virsh vol-list default|awk \'/var/ {print $2}\'); do echo $fn; virsh vol-delete $fn ; done')
+            sh(script: 'virsh list --all ; virsh net-list --all ; virsh pool-list --all; virsh vol-list default')
+            sh(script: 'docker rm -f $(docker ps -a -q) || :')
+            sh(script: 'docker system prune --all --force --volumes || :')
         }
 
         // Fetch the necessary images
