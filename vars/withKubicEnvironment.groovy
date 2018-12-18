@@ -51,7 +51,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
             sh(script: 'virsh net-destroy caasp-dev-net || : ')
             sh(script: 'virsh net-undefine net || : ')
             sh(script: 'virsh net-destroy net || : ')
-            sh(script: 'for i in $(virsh list --all --name);do echo $i;virsh destroy $i;done')
+            sh(script: 'for i in $(virsh list --all --name);do echo $i;virsh destroy $i || : ;done')
             sh(script: 'for i in $(virsh list --all --name);do echo $i;virsh undefine $i;done')
             sh(script: 'for fn in $(virsh vol-list default|awk \'/var/ {print $2}\'); do echo $fn; virsh vol-delete $fn ; done')
             sh(script: 'virsh list --all ; virsh net-list --all ; virsh pool-list --all; virsh vol-list default')
