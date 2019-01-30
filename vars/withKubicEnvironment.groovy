@@ -189,6 +189,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
             stage('Cleanup') {
                 if (environmentDestroy) {
                     try {
+                        echo "deleting workspace directory"
                         cleanWs()
                     } catch (Exception exc) {
                         // TODO: Figure out if we can mark this stage as failed, while allowing the remaining stages to proceed.

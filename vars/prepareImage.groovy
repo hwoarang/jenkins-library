@@ -25,6 +25,8 @@ def call(Map parameters = [:]) {
             return prepareImageCaaspBareMetal(typeOptions: typeOptions)
         case 'hyperv':
             return prepareImageCaaspHyperv(typeOptions: typeOptions)
+        case 'vmware':
+            return prepareImageCaaspVMware(typeOptions: typeOptions)
         default:
             error("Unknown environment type: ${type}")
     }
