@@ -35,6 +35,12 @@ def call(Map parameters = [:]) {
                         }
                     } finally {
                         junit "testinfra-${minion.role}-${minion.index}.xml"
+                        try {
+                            sh("set -o pipefail; ls -R /tmp;  cp /tmp/cluster_info/nodes.json nodes.json")
+                            archiveArtifacts(artifacts: "nodes.json")
+                        } catch (Exception exc) {
+                            echo "Failed to Archive Artifacts"
+                        }
                     }
                 }
 
