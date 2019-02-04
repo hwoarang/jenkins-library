@@ -16,7 +16,7 @@ def call(Map parameters = [:]) {
     def e2eFocus = parameters.get('e2eFocus', null)
     def e2eSkip = parameters.get('e2eSkip', null)
     def sonobuoyImage = parameters.get('sonobuoyImage', 'gcr.io/heptio-images/sonobuoy')
-    def sonobuoyVersion = parameters.get('sonobuoyVersion', 'latest')
+    def sonobuoyVersion = parameters.get('sonobuoyVersion', 'v0.12.1')
     def e2eCmd = "./e2e-tests --kubeconfig ${WORKSPACE}/kubeconfig"
 
     if (e2eFocus != null) {
