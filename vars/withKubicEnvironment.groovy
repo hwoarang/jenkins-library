@@ -44,8 +44,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
         // Cleanup host before run
         stage('Cleanup') {
             // Delete any leftover workspace and create a new one
-            sh(script: 'rm -rf ${WORKSPACE} || : ')
-            sh(script: 'mkdir -p ${WORKSPACE}/logs || : ')
+            sh(script: 'rm -rf ${WORKSPACE}; mkdir -p ${WORKSPACE}/logs')
             sh(script: 'chmod a+x ${WORKSPACE} || : ')
             sh(script: 'virsh net-undefine caasp-dev-net || : ')
             sh(script: 'virsh net-destroy caasp-dev-net || : ')
