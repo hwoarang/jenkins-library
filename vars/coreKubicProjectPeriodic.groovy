@@ -37,12 +37,9 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body = n
                 chooseCrio: chooseCrio,
                 preBootstrapBody: preBootstrapBody) {
 
-            // Run the Core Project Tests
-            coreKubicProjectTests(
-              environment: environment,
-              podName: 'default',
-              replicaCount: 15,
-              replicasCreationIntervalSeconds: 600
+            // Run the core project node tests
+            coreKubicProjectNodeTests(
+              environment: environment
             )
 
             if (body != null) {
