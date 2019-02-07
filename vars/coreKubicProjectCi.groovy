@@ -37,10 +37,9 @@ def call() {
             masterCount: 3,
             workerCount: 2) {
 
-        // Run the Core Project Tests
-        coreKubicProjectTests(
+        // Run the core project node tests
+        coreKubicProjectNodeTests(
           environment: environment,
-          podName: 'default'
         )
 
         // Run through the upgrade orchestration
@@ -53,10 +52,9 @@ def call() {
             environment: environment
         )
 
-        // Run the Core Project Tests again
-        coreKubicProjectTests(
-          environment: environment,
-          podName: 'default'
+        // Run the core project node tests again
+        coreKubicProjectNodeTests(
+          environment: environment
         )
     }
 }
