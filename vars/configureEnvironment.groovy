@@ -22,7 +22,7 @@ Environment call(Map parameters = [:]) {
 
     timeout(10) {
         dir('automation/misc-tools') {
-            sh(script: "python3 ./wait-for-velum https://\$(jq '.minions[0].addresses.publicIpv4' -r ${WORKSPACE}/environment.json)")
+            sh(script: "python3 ./wait-for-velum https://\$(jq '.dashboardExternalHost' -r ${WORKSPACE}/environment.json)")
         }
     }
 
