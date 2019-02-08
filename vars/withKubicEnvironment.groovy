@@ -18,6 +18,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
     def environmentType = parameters.get('environmentType', 'caasp-kvm')
     def environmentTypeOptions = parameters.get('environmentTypeOptions', null)
     boolean environmentDestroy = parameters.get('environmentDestroy', true)
+    boolean retrieveSupportconfigOnlyOnFailure = parameters.get('retrieveSupportconfigOnlyOnFailure', false)
     def gitBase = parameters.get('gitBase', 'https://github.com/kubic-project')
     def gitBranch = parameters.get('gitBranch', env.getEnvironment().get('CHANGE_TARGET', env.BRANCH_NAME))
     def gitCredentialsId = parameters.get('gitCredentialsId', 'github-token')
@@ -25,7 +26,6 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
     int masterCount = parameters.get('masterCount', 3)
     int workerCount = parameters.get('workerCount', 2)
     boolean chooseCrio = parameters.get('chooseCrio', false)
-    boolean writeLogsToDb = parameters.get('writeLogsToDb', true)
 
     echo "Creating Kubic Environment"
 
@@ -149,37 +149,25 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
             buildFailure = true
             throw exc
         } finally {
-            // Gather Netdata metrics and generate charts
-            stage('Gather Netdata metrics') {
-              netdataCaptureCharts()
-            }
+            if (buildFailure || !retrieveSupportconfigOnlyOnFailure) {
+                // Gather Netdata metrics and generate charts
+                stage('Gather Netdata metrics') {
+                  netdataCaptureCharts()
+                }
 
-            // Gather logs from the environment
-            stage('Gather Logs') {
-                try {
-                    gatherKubicLogs(environment: environment)
-                } catch (Exception exc) {
-                    // TODO: Figure out if we can mark this stage as failed, while allowing the remaining stages to proceed.
-                    echo "Failed to Gather Logs"
+                // Gather logs from the environment
+                stage('Gather Logs') {
+                    try {
+                        gatherKubicLogs(environment: environment)
+                    } catch (Exception exc) {
+                        // TODO: Figure out if we can mark this stage as failed, while allowing the remaining stages to proceed.
+                        echo "Failed to Gather Logs"
+                    }
                 }
             }
 
             // Destroy the Kubic Environment
             stage('Destroy Environment') {
-                if (environmentDestroy && buildFailure) {
-                    // If a run fails allow skipping cleanup
-                    echo "Requesting user input before destroying the environment"
-                    try {
-                        timeout(time: 15, unit: 'MINUTES') {
-                            environmentDestroy = input(id: 'Destroy1', message: "Destroy environment now?", parameters: [
-                                booleanParam(name: 'environmentDestroy', defaultValue: true, description: '')
-                            ])
-                        }
-                    } catch(err) {
-                      echo "Input timeout reached: destroying environment now"
-                    }
-                }
-
                 if (environmentDestroy) {
                     try {
                         cleanupEnvironment(
@@ -197,28 +185,15 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
                 }
             }
 
-            // Archive the logs
-            stage('Archive Logs') {
-                try {
-                    archiveArtifacts(artifacts: 'logs/**', fingerprint: true)
-                    archiveArtifacts(artifacts: 'netdata/**', fingerprint: true)
-                } catch (Exception exc) {
-                    // TODO: Figure out if we can mark this stage as failed, while allowing the remaining stages to proceed.
-                    echo "Failed to Archive Logs"
-                }
-
-                if (writeLogsToDb) {
-                  echo "Writing logs to database"
-                  try {
-                    withCredentials([string(credentialsId: 'database-host', variable: 'DBHOST')]) {
-                      withCredentials([string(credentialsId: 'database-password', variable: 'DBPASS')]) {
-                        String status = currentBuild.currentResult
-                        def starttime = new Date(currentBuild.startTimeInMillis).format("yyyy-MM-dd HH:mm")
-                        sh(script: "/usr/bin/mysql -h ${DBHOST} -u jenkins -p${DBPASS} testplan -e \"INSERT INTO test_outcome (build_num, build_url, branch, status, pipeline, start_time) VALUES (\'$BUILD_NUMBER\', \'$BUILD_URL\', \'$BRANCH_NAME\', \'${status}\', \'$JOB_NAME\', \'${starttime}\') \" ")
-                      }
-                    }
+            if (buildFailure || !retrieveSupportconfigOnlyOnFailure) {
+                // Archive the logs
+                stage('Archive Logs') {
+                    try {
+                        archiveArtifacts(artifacts: 'logs/**', fingerprint: true)
+                        archiveArtifacts(artifacts: 'netdata/**', fingerprint: true)
                     } catch (Exception exc) {
-                        echo "Failed to write to database"
+                        // TODO: Figure out if we can mark this stage as failed, while allowing the remaining stages to proceed.
+                        echo "Failed to Archive Logs"
                     }
                 }
             }
