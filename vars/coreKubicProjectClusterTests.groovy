@@ -21,10 +21,6 @@ def call(Map parameters = [:]) {
 
     echo "Starting Kubic core project tests"
 
-    stage('Node Tests') {
-        runTestInfra(environment: environment)
-    }
-
     stage('Cluster Tests') {
         sh(script: "kubectl --version")
         sh(script: "set -o pipefail; kubectl get nodes --kubeconfig=${WORKSPACE}/kubeconfig -o jsonpath='{.items[*].status.nodeInfo.containerRuntimeVersion}'|tr ' ' '\n'|sort|uniq -c ")
