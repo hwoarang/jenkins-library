@@ -26,6 +26,9 @@ def call() {
     properties([
         buildDiscarder(logRotator(numToKeepStr: '15')),
         disableConcurrentBuilds(),
+        parameters([
+            booleanParam(name: 'RETRIEVE_SUPPORTCONFIG_ONLY_ON_FAILURE', defaultValue: false, description: 'Run supportconfig only if run failed?')
+        ])
     ])
 
     withKubicEnvironment(
@@ -35,7 +38,8 @@ def call() {
             gitBranch: env.getEnvironment().get('CHANGE_TARGET', env.BRANCH_NAME),
             gitCredentialsId: 'github-token',
             masterCount: 3,
-            workerCount: 2) {
+            workerCount: 2,
+            retrieveSupportconfigOnlyOnFailure: env.getEnvironment().get('RETRIEVE_SUPPORTCONFIG_ONLY_ON_FAILURE', (env.CHANGE_ID != null) ? 'true' : 'false').toBoolean()) {
 
         // Run the core project node tests
         coreKubicProjectNodeTests(

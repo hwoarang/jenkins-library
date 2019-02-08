@@ -18,6 +18,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
     def environmentType = parameters.get('environmentType', 'caasp-kvm')
     def environmentTypeOptions = parameters.get('environmentTypeOptions', null)
     boolean environmentDestroy = parameters.get('environmentDestroy', true)
+    boolean retrieveSupportconfigOnlyOnFailure = parameters.get('retrieveSupportconfigOnlyOnFailure', false)
     def gitBase = parameters.get('gitBase', 'https://github.com/kubic-project')
     def gitBranch = parameters.get('gitBranch', env.getEnvironment().get('CHANGE_TARGET', env.BRANCH_NAME))
     def gitCredentialsId = parameters.get('gitCredentialsId', 'github-token')
@@ -73,6 +74,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
 
         Environment environment;
 
+        boolean buildFailure = false
         try {
             // Create the Kubic environment
             stage('Create Environment') {
@@ -137,14 +139,19 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
                 // handle cases where the closure modify the environment.
                 environment = bodyResult
             }
+        } catch (Exception exc) {
+            buildFailure = true
+            throw exc
         } finally {
-            // Gather logs from the environment
-            stage('Gather Logs') {
-                try {
-                    gatherKubicLogs(environment: environment)
-                } catch (Exception exc) {
-                    // TODO: Figure out if we can mark this stage as failed, while allowing the remaining stages to proceed.
-                    echo "Failed to Gather Logs"
+            if (buildFailure || !retrieveSupportconfigOnlyOnFailure) {
+                // Gather logs from the environment
+                stage('Gather Logs') {
+                    try {
+                        gatherKubicLogs(environment: environment)
+                    } catch (Exception exc) {
+                        // TODO: Figure out if we can mark this stage as failed, while allowing the remaining stages to proceed.
+                        echo "Failed to Gather Logs"
+                    }
                 }
             }
 
@@ -168,25 +175,15 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
                 }
             }
 
-            // Archive the logs
-            stage('Archive Logs') {
-                try {
-                    archiveArtifacts(artifacts: 'logs/**', fingerprint: true)
-                } catch (Exception exc) {
-                    // TODO: Figure out if we can mark this stage as failed, while allowing the remaining stages to proceed.
-                    echo "Failed to Archive Logs"
-                }
-                echo "Writing logs to database"
-                try {
-                  withCredentials([string(credentialsId: 'database-host', variable: 'DBHOST')]) {
-                    withCredentials([string(credentialsId: 'database-password', variable: 'DBPASS')]) {
-                      String status = currentBuild.currentResult
-                      def starttime = new Date(currentBuild.startTimeInMillis).format("yyyy-MM-dd HH:mm")
-                      sh(script: "/usr/bin/mysql -h ${DBHOST} -u jenkins -p${DBPASS} testplan -e \"INSERT INTO test_outcome (build_num, build_url, branch, status, pipeline, start_time) VALUES (\'$BUILD_NUMBER\', \'$BUILD_URL\', \'$BRANCH_NAME\', \'${status}\', \'$JOB_NAME\', \'${starttime}\') \" ")
+            if (buildFailure || !retrieveSupportconfigOnlyOnFailure) {
+                // Archive the logs
+                stage('Archive Logs') {
+                    try {
+                        archiveArtifacts(artifacts: 'logs/**', fingerprint: true)
+                    } catch (Exception exc) {
+                        // TODO: Figure out if we can mark this stage as failed, while allowing the remaining stages to proceed.
+                        echo "Failed to Archive Logs"
                     }
-                  }
-                } catch (Exception exc) {
-                    echo "Failed to write to database"
                 }
             }
 
