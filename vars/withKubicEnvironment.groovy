@@ -177,7 +177,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
                             workerCount: workerCount
                         )
                     } catch (Exception exc) {
-                        echo "Failed to Destroy Environment."
+                        echo "Failed to Destroy Environment: " + exc.toString()
                     }
                 } else {
                     echo "Skipping Destroy Environment as requested"
