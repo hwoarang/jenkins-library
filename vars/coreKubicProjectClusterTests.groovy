@@ -21,10 +21,6 @@ def call(Map parameters = [:]) {
 
     echo "Starting Kubic core project tests"
 
-    stage('Node Tests') {
-        runTestInfra(environment: environment)
-    }
-
     stage('Cluster Tests') {
         parallel 'K8S Pod Tests': {
             runK8SPodTests(
