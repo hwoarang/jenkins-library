@@ -87,11 +87,6 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
                 )
             }
 
-            stage('Deploy CI Tools') {
-                // Install Netdata on admin host
-                sh(script: "set -o pipefail; ${WORKSPACE}/automation/misc-tools/netdata/install admin | tee ${WORKSPACE}/logs/netdata-install-admin.log")
-            }
-
             if (preBootstrapBody != null) {
                 // Prepare the body closure delegate
                 def delegate = [:]
@@ -150,11 +145,6 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
             throw exc
         } finally {
             if (buildFailure || !retrieveSupportconfigOnlyOnFailure) {
-                // Gather Netdata metrics and generate charts
-                stage('Gather Netdata metrics') {
-                  netdataCaptureCharts()
-                }
-
                 // Gather logs from the environment
                 stage('Gather Logs') {
                     try {
@@ -177,7 +167,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
                             workerCount: workerCount
                         )
                     } catch (Exception exc) {
-                        echo "Failed to Destroy Environment."
+                        echo "Failed to Destroy Environment: " + exc.toString()
                     }
                 } else {
                     echo "Skipping Destroy Environment as requested"
@@ -190,7 +180,6 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
                 stage('Archive Logs') {
                     try {
                         archiveArtifacts(artifacts: 'logs/**', fingerprint: true)
-                        archiveArtifacts(artifacts: 'netdata/**', fingerprint: true)
                     } catch (Exception exc) {
                         // TODO: Figure out if we can mark this stage as failed, while allowing the remaining stages to proceed.
                         echo "Failed to Archive Logs"

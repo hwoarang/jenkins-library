@@ -30,7 +30,7 @@ OpenstackTypeOptions call(Map parameters = [:]) {
     timeout(10) {
         withCredentials([file(credentialsId: options.openrcCredentialId, variable: 'OPENRC')]) {
             // Find the latest Devel image if we've not been given a specific image
-            options.image = sh(script: "set -o pipefail; set +x; source $OPENRC; openstack image list --property caasp-channel='${options.channel}' --property caasp-version='3.0' -c Name -f value | sort -r -V | head -n1 | tr -d \"\n\"", returnStdout: true)
+            options.image = sh(script: "set -o pipefail; set +x; source $OPENRC; openstack image list --property caasp-channel='${options.channel}' --property caasp-version='4.0' -c Name -f value | sort -r -V | head -n1 | tr -d \"\n\"", returnStdout: true)
         }
     }
 
