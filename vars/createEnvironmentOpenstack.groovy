@@ -27,7 +27,7 @@ Environment call(Map parameters = [:]) {
     }
 
     Environment environment
-    String stackName = "${JOB_NAME}-${BUILD_NUMBER}".replace("/", "-")
+    String stackName = "${JOB_NAME}-${BUILD_NUMBER}".replace("/", "-").replace("caasp-nightly-openstack", "nightly")
 
     timeout(60) {
         if (deployment == 'terraform') {
