@@ -14,11 +14,11 @@
 def call(Map parameters = [:]) {
     echo "Starting GitHub Collaborator Check"
 
-    String hosting = getRepoInfo('repo')["hosting"]
     String org = parameters.get('org')
     String repo = parameters.get('repo')
     String user = parameters.get('user')
     String credentialsId = parameters.get('credentialsId')
+    String hosting = getRepoInfo(repo)["hosting"]
 
     if (hosting != "github.com") {
         echo "The repository is not hosted on Github, Skipping check..."
