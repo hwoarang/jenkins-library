@@ -13,11 +13,11 @@
 // limitations under the License.
 // Clones a single Kubic Repo.
 def call(Map parameters = [:]) {
-    def gitBase = parameters.get('gitBase')
     def branch = parameters.get('branch')
     def credentialsId = parameters.get('credentialsId')
     boolean ignorePullRequest = parameters.get('ignorePullRequest', false)
     def repo = parameters.get('repo')
+    def gitBase = "https://" + getRepoInfo(repo)["hosting"] + "/" + getRepoInfo(repo)["organization"]
 
     echo "Cloning Kubic Repo: ${repo}"
 

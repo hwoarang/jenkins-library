@@ -19,7 +19,6 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
     def environmentTypeOptions = parameters.get('environmentTypeOptions', null)
     boolean environmentDestroy = parameters.get('environmentDestroy', true)
     boolean retrieveSupportconfigOnlyOnFailure = parameters.get('retrieveSupportconfigOnlyOnFailure', false)
-    def gitBase = parameters.get('gitBase', 'https://github.com/kubic-project')
     def gitBranch = parameters.get('gitBranch', env.getEnvironment().get('CHANGE_TARGET', env.BRANCH_NAME))
     def gitCredentialsId = parameters.get('gitCredentialsId', 'github-token')
     boolean gitIgnorePullRequest = parameters.get('gitIgnorePullRequest', false)
@@ -61,7 +60,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
 
         // Fetch the necessary code
         stage('Retrieve Code') {
-            cloneAllKubicRepos(gitBase: gitBase, branch: gitBranch, credentialsId: gitCredentialsId, ignorePullRequest: gitIgnorePullRequest)
+            cloneAllKubicRepos(branch: gitBranch, credentialsId: gitCredentialsId, ignorePullRequest: gitIgnorePullRequest)
         }
 
         // Fetch the necessary images

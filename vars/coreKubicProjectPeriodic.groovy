@@ -28,7 +28,6 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body = n
                 environmentType: environmentType,
                 environmentTypeOptions: environmentTypeOptions,
                 environmentDestroy: environmentDestroy,
-                gitBase: 'https://github.com/kubic-project',
                 gitBranch: env.getEnvironment().get('CHANGE_TARGET', env.BRANCH_NAME),
                 gitCredentialsId: 'github-token',
                 masterCount: masterCount,
