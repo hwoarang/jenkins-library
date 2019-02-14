@@ -18,6 +18,12 @@ def call(Map parameters = [:]) {
     String repo = parameters.get('repo')
     String user = parameters.get('user')
     String credentialsId = parameters.get('credentialsId')
+    String hosting = getRepoInfo(repo)["hosting"]
+
+    if (hosting != "github.com") {
+        echo "The repository is not hosted on Github, Skipping check..."
+        return true;
+    }
 
     if (env.CHANGE_AUTHOR != null) {
         // Check if a change is from collaborator, or not.

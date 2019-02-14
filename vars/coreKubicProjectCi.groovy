@@ -36,7 +36,6 @@ def call() {
             nodeLabel: 'leap15.0&&caasp-pr-worker',
             environmentType: 'caasp-kvm',
             environmentDestroy: env.getEnvironment().get('ENVIRONMENT_DESTROY', 'true').toBoolean(),
-            gitBase: 'https://github.com/kubic-project',
             gitBranch: env.getEnvironment().get('CHANGE_TARGET', env.BRANCH_NAME),
             gitCredentialsId: 'github-token',
             masterCount: 3,
