@@ -14,7 +14,6 @@
 // Clones a single Kubic Repo.
 def call(Map parameters = [:]) {
     def branch = parameters.get('branch')
-    def credentialsId = parameters.get('credentialsId')
     boolean ignorePullRequest = parameters.get('ignorePullRequest', false)
     def repo = parameters.get('repo')
     def gitBase = "https://" + getRepoInfo(repo)["hosting"] + "/" + getRepoInfo(repo)["organization"]
@@ -35,7 +34,7 @@ def call(Map parameters = [:]) {
                             [$class: 'CleanCheckout']
                         ],
                         userRemoteConfigs: [
-                            [url:"${gitBase}/${repo}.git", credentialsId: credentialsId]
+                            [url:"${gitBase}/${repo}.git", credentialsId: getRepoInfo(repo)["token"]]
                         ]
                     ])
 
@@ -58,7 +57,7 @@ def call(Map parameters = [:]) {
                     $class: 'GitSCM',
                     branches: [[name: "*/${branch}"]],
                     userRemoteConfigs: [
-                        [url: "${gitBase}/${repo}.git", credentialsId: credentialsId]
+                        [url: "${gitBase}/${repo}.git", credentialsId: getRepoInfo(repo)["token"]]
                     ],
                     extensions: [[$class: 'CleanCheckout']],
                 ])

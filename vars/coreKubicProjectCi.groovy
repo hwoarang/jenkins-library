@@ -20,7 +20,7 @@ def call() {
         org: 'kubic-project',
         repo: 'salt',
         user: env.CHANGE_AUTHOR,
-        credentialsId: 'github-token')
+        credentialsId: getRepoInfo('salt')["token"])
 
     // Configure the job properties
     properties([
@@ -37,7 +37,6 @@ def call() {
             environmentType: 'caasp-kvm',
             environmentDestroy: env.getEnvironment().get('ENVIRONMENT_DESTROY', 'true').toBoolean(),
             gitBranch: env.getEnvironment().get('CHANGE_TARGET', env.BRANCH_NAME),
-            gitCredentialsId: 'github-token',
             masterCount: 3,
             workerCount: 2,
             retrieveSupportconfigOnlyOnFailure: env.getEnvironment().get('RETRIEVE_SUPPORTCONFIG_ONLY_ON_FAILURE', (env.CHANGE_ID != null) ? 'true' : 'false').toBoolean()) {

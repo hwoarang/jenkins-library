@@ -30,7 +30,6 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body = n
                 environmentTypeOptions: environmentTypeOptions,
                 environmentDestroy: environmentDestroy,
                 gitBranch: env.getEnvironment().get('CHANGE_TARGET', env.BRANCH_NAME),
-                gitCredentialsId: 'github-token',
                 masterCount: masterCount,
                 workerCount: workerCount,
                 chooseCrio: chooseCrio,
