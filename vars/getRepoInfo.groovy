@@ -15,11 +15,11 @@
 def call(String repository) {
     // Definitive list of repositories
     def Repositories = [
-        "automation": ["github.com", "kubic-project"],
-        "jenkins-library": ["github.com", "kubic-project"],
-        "salt": ["github.com", "kubic-project"],
-        "velum": ["github.com", "kubic-project"],
-        "caasp-container-manifests": ["github.com", "kubic-project"],
+        "automation": ["github.com", "kubic-project", "github-token"],
+        "jenkins-library": ["github.com", "kubic-project", "github-token"],
+        "salt": ["github.com", "kubic-project", "github-token"],
+        "velum": ["github.com", "kubic-project", "github-token"],
+        "caasp-container-manifests": ["github.com", "kubic-project", "github-token"],
     ]
-    return ["hosting": Repositories[repository][0], "organization": Repositories[repository][1]]
+    return ["hosting": Repositories[repository][0], "organization": Repositories[repository][1], "token": Repositories[repository][2]]
 }

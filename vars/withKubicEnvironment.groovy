@@ -20,7 +20,6 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
     boolean environmentDestroy = parameters.get('environmentDestroy', true)
     boolean retrieveSupportconfigOnlyOnFailure = parameters.get('retrieveSupportconfigOnlyOnFailure', false)
     def gitBranch = parameters.get('gitBranch', env.getEnvironment().get('CHANGE_TARGET', env.BRANCH_NAME))
-    def gitCredentialsId = parameters.get('gitCredentialsId', 'github-token')
     boolean gitIgnorePullRequest = parameters.get('gitIgnorePullRequest', false)
     int masterCount = parameters.get('masterCount', 3)
     int workerCount = parameters.get('workerCount', 2)
@@ -61,7 +60,7 @@ def call(Map parameters = [:], Closure preBootstrapBody = null, Closure body) {
 
         // Fetch the necessary code
         stage('Retrieve Code') {
-            cloneAllKubicRepos(branch: gitBranch, credentialsId: gitCredentialsId, ignorePullRequest: gitIgnorePullRequest)
+            cloneAllKubicRepos(branch: gitBranch, ignorePullRequest: gitIgnorePullRequest)
         }
 
         // Fetch the necessary images
