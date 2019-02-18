@@ -22,7 +22,7 @@ def call(Map parameters = [:]) {
         org: 'kubic-project',
         repo: 'salt',
         user: env.CHANGE_AUTHOR,
-        credentialsId: getRepoInfo('salt')["token"])
+        credentialsId: getRepoInfo('salt', env.getEnvironment().get('CHANGE_TARGET',env.BRANCH_NAME))["token"])
 
     def label = "housekeeping-${UUID.randomUUID().toString()}"
 

@@ -12,14 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-def call(String repository) {
+def call(String repository, String branch) {
     // Definitive list of repositories
     def Repositories = [
-        "automation": ["github.com", "kubic-project", "github-token"],
-        "jenkins-library": ["github.com", "kubic-project", "github-token"],
-        "salt": ["github.com", "kubic-project", "github-token"],
-        "velum": ["github.com", "kubic-project", "github-token"],
-        "caasp-container-manifests": ["github.com", "kubic-project", "github-token"],
+        "automation": [
+            "master": [ "github.com", "kubic-project", "github-token"],
+            "release-3.0": [ "github.com", "kubic-project", "github-token"]],
+        "jenkins-library": [
+            "master": ["github.com", "kubic-project", "github-token"],
+            "release-3.0": ["github.com", "kubic-project", "github-token"]],
+        "salt": [
+            "master": ["github.com", "kubic-project", "github-token"],
+            "release-3.0": ["github.com", "kubic-project", "github-token"]],
+        "velum": [
+            "master": ["github.com", "kubic-project", "github-token"],
+            "release-3.0": ["github.com", "kubic-project", "github-token"]],
+        "caasp-container-manifests": [
+            "master": ["github.com", "kubic-project", "github-token"],
+            "release-3.0": ["github.com", "kubic-project", "github-token"]],
     ]
-    return ["hosting": Repositories[repository][0], "organization": Repositories[repository][1], "token": Repositories[repository][2]]
+    return ["hosting": Repositories[branch][repository][0], "organization": Repositories[branch][repository][1], "token": Repositories[branch][repository][2]]
 }
