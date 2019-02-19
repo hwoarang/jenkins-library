@@ -15,7 +15,10 @@
 def call(Map parameters = [:]) {
     def branch = parameters.get('branch')
     boolean ignorePullRequest = parameters.get('ignorePullRequest', false)
+    // The directory in which we will checkout the source code
     def repo = parameters.get('repo')
+    // The name of the repository as it's hosted on Git.
+    def project_repo = getRepoInfo(repo, branch)["repository"]
     def gitBase = "https://" + getRepoInfo(repo, branch)["hosting"] + "/" + getRepoInfo(repo, branch)["organization"]
 
     echo "Cloning Kubic Repo: ${repo}"
@@ -25,13 +28,13 @@ def call(Map parameters = [:]) {
             if (!ignorePullRequest && env.JOB_NAME.contains(repo)) {
                 if (env.CHANGE_ID) {
                     echo 'Attempting rebase...'
-
                     checkout([
                         $class: 'GitSCM',
                         branches:  [[name: "*/${env.CHANGE_TARGET}"]],
                         extensions: [
                             [$class: 'LocalBranch'],
-                            [$class: 'CleanCheckout']
+                            [$class: 'CleanCheckout'],
+                            [$class: 'RelativeTargetDirectory', relativeTargetDir: '../' + project_repo]
                         ],
                         userRemoteConfigs: [
                             [url:"${gitBase}/${repo}.git", credentialsId: getRepoInfo(repo, branch)["token"]]
@@ -59,7 +62,10 @@ def call(Map parameters = [:]) {
                     userRemoteConfigs: [
                         [url: "${gitBase}/${repo}.git", credentialsId: getRepoInfo(repo, branch)["token"]]
                     ],
-                    extensions: [[$class: 'CleanCheckout']],
+                    extensions: [
+                        [$class: 'CleanCheckout'],
+                        [$class: 'RelativeTargetDirectory', relativeTargetDir: '../' + project_repo]
+                    ],
                 ])
             }
         }

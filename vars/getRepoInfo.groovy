@@ -17,71 +17,82 @@ def call(String repository, String branch) {
     def Repositories = [
             "automation": [
                 "master": [
-                    "repo": "github.com",
+                    "host": "github.com",
                     "org": "kubic-project",
+                    "repo": "automation",
                     "token": "github-token"
                 ],
                 "release-3.0": [
-                    "repo": "github.com",
+                    "host": "github.com",
                     "org": "kubic-project",
+                    "repo": "automation",
                     "token": "github-token",
                 ]
             ],
 
             "jenkins-library": [
                 "master": [
-                    "repo": "github.com",
+                    "host": "github.com",
                     "org": "kubic-project",
+                    "repo": "jenkins-library",
                     "token": "github-token",
                 ],
                 "release-3.0": [
-                    "repo": "github.com",
+                    "host": "github.com",
                     "org": "kubic-project",
+                    "repo": "jenkins-library",
                     "token": "github-token",
                 ]
             ],
 
             "salt": [
                 "master": [
-                    "repo": "github.com",
+                    "host": "github.com",
                     "org": "kubic-project",
+                    "repo": "salt",
                     "token": "github-token",
                 ],
                 "release-3.0": [
-                    "repo": "github.com",
+                    "host": "github.com",
                     "org": "kubic-project",
+                    "repo": "salt",
                     "token": "github-token",
                 ]
             ],
 
            "velum": [
                 "master": [
-                    "repo": "github.com",
+                    "host": "github.com",
                     "org": "kubic-project",
+                    "repo": "velum",
                     "token": "github-token",
                 ],
                 "release-3.0": [
-                    "repo": "github.com",
+                    "host": "github.com",
                     "org": "kubic-project",
+                    "repo": "velum",
                     "token": "github-token",
                 ]
             ],
             "caasp-container-manifests": [
                 "master": [
-                    "repo": "github.com",
+                    "host": "github.com",
                     "org": "kubic-project",
+                    "repo": "caasp-container-manifests",
                     "token": "github-token",
                 ],
                 "release-3.0": [
-                    "repo": "github.com",
+                    "host": "github.com",
                     "org": "kubic-project",
+                    "repo": "caasp-container-manifests",
                     "token": "github-token",
                 ]
             ]
         ]
     return [
-        "hosting": Repositories[repository][branch]["repo"],
+        "hosting": Repositories[repository][branch]["host"],
         "organization": Repositories[repository][branch]["org"],
+        "repository": Repositories[repository][branch]["repo"],
         "token": Repositories[repository][branch]["token"]
     ]
 }
