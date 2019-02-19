@@ -12,14 +12,76 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-def call(String repository) {
+def call(String repository, String branch) {
     // Definitive list of repositories
     def Repositories = [
-        "automation": ["github.com", "kubic-project", "github-token"],
-        "jenkins-library": ["github.com", "kubic-project", "github-token"],
-        "salt": ["github.com", "kubic-project", "github-token"],
-        "velum": ["github.com", "kubic-project", "github-token"],
-        "caasp-container-manifests": ["github.com", "kubic-project", "github-token"],
+            "automation": [
+                "master": [
+                    "repo": "github.com",
+                    "org": "kubic-project",
+                    "token": "github-token"
+                ],
+                "release-3.0": [
+                    "repo": "github.com",
+                    "org": "kubic-project",
+                    "token": "github-token",
+                ]
+            ],
+
+            "jenkins-library": [
+                "master": [
+                    "repo": "github.com",
+                    "org": "kubic-project",
+                    "token": "github-token",
+                ],
+                "release-3.0": [
+                    "repo": "github.com",
+                    "org": "kubic-project",
+                    "token": "github-token",
+                ]
+            ],
+
+            "salt": [
+                "master": [
+                    "repo": "github.com",
+                    "org": "kubic-project",
+                    "token": "github-token",
+                ],
+                "release-3.0": [
+                    "repo": "github.com",
+                    "org": "kubic-project",
+                    "token": "github-token",
+                ]
+            ],
+
+           "velum": [
+                "master": [
+                    "repo": "github.com",
+                    "org": "kubic-project",
+                    "token": "github-token",
+                ],
+                "release-3.0": [
+                    "repo": "github.com",
+                    "org": "kubic-project",
+                    "token": "github-token",
+                ]
+            ],
+            "caasp-container-manifests": [
+                "master": [
+                    "repo": "github.com",
+                    "org": "kubic-project",
+                    "token": "github-token",
+                ],
+                "release-3.0": [
+                    "repo": "github.com",
+                    "org": "kubic-project",
+                    "token": "github-token",
+                ]
+            ]
+        ]
+    return [
+        "hosting": Repositories[repository][branch]["repo"],
+        "organization": Repositories[repository][branch]["org"],
+        "token": Repositories[repository][branch]["token"]
     ]
-    return ["hosting": Repositories[repository][0], "organization": Repositories[repository][1], "token": Repositories[repository][2]]
 }

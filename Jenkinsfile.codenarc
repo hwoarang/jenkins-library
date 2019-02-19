@@ -12,7 +12,7 @@ githubCollaboratorCheck(
     org: 'kubic-project',
     repo: 'jenkins-library',
     user: env.CHANGE_AUTHOR,
-    credentialsId: getRepoInfo('jenkins-library')["token"])
+    credentialsId: getRepoInfo('jenkins-library', 'master')["token"])
 
 node("leap15.0&&caasp-pr-worker") {
     stage('Retrieve Code') {

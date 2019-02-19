@@ -16,7 +16,7 @@ def call(Map parameters = [:]) {
     def branch = parameters.get('branch')
     boolean ignorePullRequest = parameters.get('ignorePullRequest', false)
     def repo = parameters.get('repo')
-    def gitBase = "https://" + getRepoInfo(repo)["hosting"] + "/" + getRepoInfo(repo)["organization"]
+    def gitBase = "https://" + getRepoInfo(repo, branch)["hosting"] + "/" + getRepoInfo(repo, branch)["organization"]
 
     echo "Cloning Kubic Repo: ${repo}"
 
@@ -34,7 +34,7 @@ def call(Map parameters = [:]) {
                             [$class: 'CleanCheckout']
                         ],
                         userRemoteConfigs: [
-                            [url:"${gitBase}/${repo}.git", credentialsId: getRepoInfo(repo)["token"]]
+                            [url:"${gitBase}/${repo}.git", credentialsId: getRepoInfo(repo, branch)["token"]]
                         ]
                     ])
 
@@ -57,7 +57,7 @@ def call(Map parameters = [:]) {
                     $class: 'GitSCM',
                     branches: [[name: "*/${branch}"]],
                     userRemoteConfigs: [
-                        [url: "${gitBase}/${repo}.git", credentialsId: getRepoInfo(repo)["token"]]
+                        [url: "${gitBase}/${repo}.git", credentialsId: getRepoInfo(repo, branch)["token"]]
                     ],
                     extensions: [[$class: 'CleanCheckout']],
                 ])
