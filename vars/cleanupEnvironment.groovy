@@ -27,6 +27,8 @@ Environment call(Map parameters = [:]) {
             return cleanupEnvironmentCaaspBareMetal(masterCount: masterCount, workerCount: workerCount, typeOptions: typeOptions)
         case 'hyperv':
             return cleanupEnvironmentCaaspHyperv(masterCount: masterCount, workerCount: workerCount, typeOptions: typeOptions)
+        case 'vmware':
+            return cleanupEnvironmentCaaspVMware(masterCount: masterCount, workerCount: workerCount, typeOptions: typeOptions)
         default:
             error("Unknown environment type: ${type}")
     }
