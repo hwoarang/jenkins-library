@@ -21,11 +21,11 @@ def call(Map parameters = [:]) {
     def project_repo = getRepoInfo(repo, branch)["repository"]
     def gitBase = "https://" + getRepoInfo(repo, branch)["hosting"] + "/" + getRepoInfo(repo, branch)["organization"]
 
-    echo "Cloning Kubic Repo: ${repo}"
+    echo "Cloning Kubic Repo: ${project_repo}"
 
     timeout(5) {
         dir(repo) {
-            if (!ignorePullRequest && env.JOB_NAME.contains(repo)) {
+            if (!ignorePullRequest && env.JOB_NAME.contains(project_repo)) {
                 if (env.CHANGE_ID) {
                     echo 'Attempting rebase...'
                     checkout([
@@ -33,11 +33,10 @@ def call(Map parameters = [:]) {
                         branches:  [[name: "*/${env.CHANGE_TARGET}"]],
                         extensions: [
                             [$class: 'LocalBranch'],
-                            [$class: 'CleanCheckout'],
-                            [$class: 'RelativeTargetDirectory', relativeTargetDir: '../' + project_repo]
+                            [$class: 'CleanCheckout']
                         ],
                         userRemoteConfigs: [
-                            [url:"${gitBase}/${repo}.git", credentialsId: getRepoInfo(repo, branch)["token"]]
+                            [url:"${gitBase}/${project_repo}.git", credentialsId: getRepoInfo(repo, branch)["token"]]
                         ]
                     ])
 
@@ -60,11 +59,10 @@ def call(Map parameters = [:]) {
                     $class: 'GitSCM',
                     branches: [[name: "*/${branch}"]],
                     userRemoteConfigs: [
-                        [url: "${gitBase}/${repo}.git", credentialsId: getRepoInfo(repo, branch)["token"]]
+                        [url: "${gitBase}/${project_repo}.git", credentialsId: getRepoInfo(repo, branch)["token"]]
                     ],
                     extensions: [
-                        [$class: 'CleanCheckout'],
-                        [$class: 'RelativeTargetDirectory', relativeTargetDir: '../' + project_repo]
+                        [$class: 'CleanCheckout']
                     ],
                 ])
             }
